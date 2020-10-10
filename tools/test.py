@@ -100,9 +100,6 @@ all_left_img, all_right_img, all_left_disp, = ls.dataloader(args.data_path,
                                                             cfg=cfg,
                                                             is_train=False)
 
-# To use reconstructed right images
-if args.right_path is not './data/kitti/training':
-    all_right_img = [args.right_path + '/' + os.path.basename(file_name) for file_name in all_right_img]
 
 class BatchCollator(object):
 
