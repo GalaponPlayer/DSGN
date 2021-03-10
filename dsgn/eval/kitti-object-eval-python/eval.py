@@ -421,9 +421,11 @@ def calculate_iou_partly(gt_annos,
             rots = np.concatenate([a["rotation_y"] for a in dt_annos_part], 0)
             dt_boxes = np.concatenate([loc, dims, rots[..., np.newaxis]],
                                       axis=1)
+
             overlap_part = d3_box_overlap(
                 gt_boxes, dt_boxes, z_axis=z_axis,
                 z_center=z_center).astype(np.float64)
+            #print(overlap_part[0:10,0:10])
         else:
             raise ValueError("unknown metric")
         parted_overlaps.append(overlap_part)

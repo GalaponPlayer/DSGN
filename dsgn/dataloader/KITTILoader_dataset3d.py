@@ -117,6 +117,13 @@ class myImageFloder(data.Dataset):
 
         left_img = self.loader(left)
         right_img = self.loader(right)
+        # print('self.loader()')
+        # print('left' + left)
+        # print('right' + right)
+        # print('img data type ' + str(type(left_img)))
+        # print('FORMAT, SIZE, MODE = ' + str(left_img.format) + ',' + str(left_img.size) + ',' + str(left_img.mode))
+        # print('FORMAT, SIZE, MODE = ' + str(right_img.format) + ',' + str(right_img.size) + ',' + str(right_img.mode))
+
         if not self.flip_this_image:
             dataL = self.dploader(disp_L)
         else:
@@ -241,10 +248,18 @@ class myImageFloder(data.Dataset):
         if self.flip_this_image:
             left_img, right_img = hflip(right_img), hflip(left_img)
             dataL = np.ascontiguousarray(dataL[:, ::-1])
+        
+       # print('img data type ' + str(type(left_img)))
+        #print('FORMAT, SIZE, MODE = ' + str(left_img.format) + ',' + str(left_img.size) + ',' + str(left_img.mode))
+        #print('FORMAT, SIZE, MODE = ' + str(right_img.format) + ',' + str(right_img.size) + ',' + str(right_img.mode))
 
         processed = preprocess.get_transform(augment=False)
+
         left_img = processed(left_img)
         right_img = processed(right_img)
+        #print('IN KITTILOADER_dataset3d.py before reshape')
+        #print('left ' + str(left_img.shape) + ' right ' + str(right_img.shape))
+
         left_img = torch.reshape(left_img,[1,3,left_img.shape[1],left_img.shape[2]])
         right_img = torch.reshape(right_img,[1,3,right_img.shape[1],right_img.shape[2]])
 
@@ -252,6 +267,9 @@ class myImageFloder(data.Dataset):
 
         top_pad = 384-left_img.shape[2]
         left_pad = 1248-left_img.shape[3]
+
+        #print('IN KITTILOADER_dataset3d.py')
+        #print('left ' + str(left_img.shape) + ' right ' + str(right_img.shape))
 
         left_img = F.pad(left_img,(0,left_pad, 0,top_pad),'constant',0)
         right_img = F.pad(right_img,(0,left_pad, 0,top_pad),'constant',0)

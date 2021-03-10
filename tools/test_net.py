@@ -15,6 +15,8 @@ import skimage
 import skimage.io
 import skimage.transform
 import numpy as np
+import pandas as pd
+from PIL import Image
 import time
 import math
 from dsgn.models import *
@@ -33,7 +35,8 @@ parser.add_argument('-cfg', '--cfg', '--config',
                     default=None, help='config path')
 parser.add_argument(
     '--data_path', default='./data/kitti/training', help='select model')
-parser.add_argument('--right_path', default='./data/kitti/training/image_2', help='right images path')
+parser.add_argument('--right_path', default='./data/kitti/training/image_3', help='right images path')
+parser.add_argument('--left_path', default='./data/kitti/training/image_2', help='left images path')
 parser.add_argument('--loadmodel', default=None, help='loading model')
 parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
@@ -101,8 +104,10 @@ all_left_img, all_right_img, all_left_disp, = ls.dataloader(args.data_path,
                                                             is_train=False)
 
 # To use reconstructed right images
-if args.right_path is not './data/kitti/training':
+if args.right_path is not './data/kitti/training/image_3':
     all_right_img = [args.right_path + '/' + os.path.basename(file_name) for file_name in all_right_img]
+if args.left_path is not './data/kitti/training/image_2':
+    all_left_img = [args.left_path + '/' + os.path.basename(file_name) for file_name in all_left_img]
 
 class BatchCollator(object):
 
@@ -347,10 +352,15 @@ def main():
             for i in range(len(image_indexes)):
                 depth_map = project_disp_to_depth_map(calib_batch[i], pred_disp[i].cpu().numpy()[:image_sizes[i][0], :image_sizes[i][1]], max_high=1., baseline=(calib_batch[i].P[0, 3] - calib_R_batch[i].P[0, 3]) / calib_batch[i].P[0, 0],
                                                       depth_disp=True)
-                if not os.path.exists('{}/depth_maps/'.format(args.save_path)):
-                    os.makedirs('{}/depth_maps/'.format(args.save_path))
-                np.save('{}/depth_maps/{:06d}.npy'.format(args.save_path,
-                                                          image_indexes[i]), depth_map)
+                depth_map = depth_map / 41.0 * 256
+                depth_image = Image.fromarray(depth_map)
+                depth_image = depth_image.convert('L')
+                # print(pd.DataFrame(pd.Series(depth_map.ravel()).describe()).transpose())
+                if not os.path.exists('{}/depth_maps/'.format(output_path)):
+                    os.makedirs('{}/depth_maps/'.format(output_path))
+                #np.save('{}/depth_maps/{:06d}.npy'.format(output_path,
+                                                          #image_indexes[i]), depth_map)
+                depth_image.save('{}/depth_maps/{:06d}.png'.format(output_path, image_indexes[i]))
 
         if args.save_lidar:
             for i in range(len(image_indexes)):

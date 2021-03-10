@@ -33,7 +33,7 @@ parser.add_argument('-cfg', '--cfg', '--config',
                     default=None, help='config path')
 parser.add_argument(
     '--data_path', default='./data/kitti/training', help='select model')
-parser.add_argument('--right_path', default='./data/kitti/training/image_2', help='right images path')
+parser.add_argument('--right_path', default='./data/kitti/training/image_3', help='right images path')
 parser.add_argument('--loadmodel', default=None, help='loading model')
 parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')

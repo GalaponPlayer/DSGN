@@ -32,6 +32,8 @@ def get_parser():
     parser = argparse.ArgumentParser(description='PSMNet')
     parser.add_argument('-cfg', '--cfg', '--config', default='./configs/default/config_car.py', help='config path')
     parser.add_argument('--data_path', default='./data/kitti/training/', help='data_path')
+    parser.add_argument('--left_path', default='./data/kitti/training/image_2', help='left images path')
+    parser.add_argument('--right_path', default='./data/kitti/training/image_3', help='right images path')
     parser.add_argument('--epochs', type=int, default=60, help='number of epochs to train')
     parser.add_argument('--loadmodel', default=None, help='load model')
     parser.add_argument('--savemodel', default=None, help='save model')
@@ -160,6 +162,12 @@ def main_worker(gpu, ngpus_per_node, args, cfg, exp):
                                                                 depth_disp=True,
                                                                 cfg=cfg,
                                                                 is_train=True)
+    if args.right_path is not './data/kitti/training/image_3':
+        all_right_img = [args.right_path + '/' + os.path.basename(file_name) for file_name in all_right_img]
+        print('RIGHT IMAGES SPECIFIED : ' + args.right_path)
+    if args.left_path is not './data/kitti/training/image_2':
+        all_left_img = [args.left_path + '/' + os.path.basename(file_name) for file_name in all_left_img]
+        print('LEFT IMAGES SPECIFIED : ' + args.left_path)
 
     ImageFloader = DA.myImageFloder(all_left_img, all_right_img, all_left_disp, True, split=args.split_file, cfg=cfg)
 
